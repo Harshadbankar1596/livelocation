@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Send Location</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 90%;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="greeting">Welcome</h2>
+    <div id="loginForm">
+      <input type="text" id="nameInput" placeholder="Enter your name" />
+      <br />
+      <button onclick="saveName()">Login</button>
+    </div>
+
+    <div id="status"></div>
+    <button onclick="refreshLocation()">📡 Send Location Again</button>
+    <br><br>
+    <button onclick="clearData()" style="background: red;">🧹 Clear Login</button>
+  </div>
+
+  <script>
+    const greeting = document.getElementById('greeting');
+    const loginForm = document.getElementById('loginForm');
+    const status = document.getElementById('status');
+
+    const savedName = localStorage.getItem('username');
+
+    if (savedName && !localStorage.getItem('locationSent')) {
+      greeting.innerText = `Hi, ${savedName}`;
+      loginForm.style.display = 'none';
+      sendLocation(savedName);
+    } else if (savedName) {
+      greeting.innerText = `Hi, ${savedName}`;
+      loginForm.style.display = 'none';
+    }
+
+    function saveName() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      localStorage.setItem('username', name);
+      greeting.innerText = `Hi, ${name}`;
+      loginForm.style.display = 'none';
+      sendLocation(name);
+    }
+
+    function sendLocation(username) {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported by your browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          fetch('/getlocation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ lat, lng, username })
+          })
+          .then(res => res.json())
+          .then(data => {
+            status.innerText = "📍 Location sent successfully!";
+            localStorage.setItem('locationSent', 'true');
+          });
+        },
+        () => {
+          status.innerText = "❌ Location access denied.";
+        }
+      );
+    }
+
+    function refreshLocation() {
+      const username = localStorage.getItem('username');
+      if (username) {
+        localStorage.removeItem('locationSent');
+        sendLocation(username);
+      }
+    }
+
+    function clearData() {
+      localStorage.removeItem('username');
+      localStorage.removeItem('locationSent');
+      location.reload();
+    }
+  </script>
+</body>
+</html>
