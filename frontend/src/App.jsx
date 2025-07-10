@@ -1,8 +1,9 @@
-// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import LocationCard from './LocationCard';
 import './index.css';
+
+const API = import.meta.env.VITE_API_URL;
 
 function App() {
   const [locations, setLocations] = useState([]);
@@ -12,17 +13,17 @@ function App() {
   }, []);
 
   const fetchLocations = () => {
-    axios.get('http://localhost:3000/alllocation')
+    axios.get(`${API}/alllocation`)
       .then(response => setLocations(response.data))
       .catch(error => console.error("Error fetching location data", error));
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this location?")) {
-      axios.delete(`http://localhost:3000/deletelocation/${id}`)
+      axios.delete(`${API}/deletelocation/${id}`)
         .then(res => {
           alert(res.data.message);
-          fetchLocations(); // Refresh list after delete
+          fetchLocations();
         })
         .catch(err => {
           console.error("Delete failed:", err);
@@ -44,4 +45,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
