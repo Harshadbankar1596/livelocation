@@ -18,6 +18,8 @@ function App() {
       .catch(error => console.error("Error fetching location data", error));
   };
 
+  console.log(locations)
+
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this location?")) {
       axios.delete(`${API}/deletelocation/${id}`)

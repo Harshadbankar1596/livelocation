@@ -18,7 +18,7 @@ app.get('/h', (req, res) => {
 });
 
 
-app.post('https://livelocation-34ee.vercel.app/getlocation', (req, res) => {
+app.post('/getlocation', (req, res) => {
   const { lat, lng, username } = req.body;
   if (!lat || !lng || !username) {
     return res.status(400).json({ error: 'lat, lng, and username are required' });
@@ -45,6 +45,7 @@ app.post('https://livelocation-34ee.vercel.app/getlocation', (req, res) => {
   console.log("✅ Location saved:", newLocation);
   res.json({ message: 'Location saved', location: newLocation });
 });
+
 
 // GET - All locations
 app.get('/alllocation', (req, res) => {
