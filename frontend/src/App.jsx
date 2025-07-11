@@ -21,17 +21,15 @@ function App() {
   console.log(locations)
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this location?")) {
+    
       axios.delete(`${API}/deletelocation/${id}`)
         .then(res => {
-          alert(res.data.message);
           fetchLocations();
         })
         .catch(err => {
           console.error("Delete failed:", err);
-          alert("❌ Failed to delete location.");
         });
-    }
+    
   };
 
   return (
